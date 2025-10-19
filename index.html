@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>건강 지킴이 탐정단 암호 해독 작전</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Jua', sans-serif;
+            background-color: #fdf3e6;
+            color: #4a3a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .escape-room-container {
+            width: 100%;
+            max-width: 800px;
+            background-color: #fff;
+            border: 5px solid #d6a78f;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            text-align: center;
+        }
+        .escape-room-header {
+            font-size: 2.2rem;
+            color: #c2410c;
+            margin-bottom: 20px;
+        }
+        .escape-room-content {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .mission-select-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .mission-button {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f59e0b;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            font-size: 1.125rem;
+        }
+        .mission-button:hover {
+            background-color: #ea580c;
+        }
+        .mission-button.completed {
+            background-color: #10b981;
+        }
+        .input-section {
+            margin-top: 30px;
+        }
+        .input-section input[type="text"]:not(.clue4-input),
+        .input-section input[type="tel"]:not(.clue4-input) {
+            font-family: 'Noto Sans KR', sans-serif;
+            border: 2px solid #d6a78f;
+            padding: 10px 15px;
+            border-radius: 5px;
+            width: 70%;
+            max-width: 300px;
+            font-size: 1rem;
+            color: #4a3a2a;
+        }
+        .input-section button {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #c2410c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-left: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            font-size: 1.1rem;
+        }
+        .input-section button:hover {
+            background-color: #a1360b;
+        }
+        .result-message {
+            font-family: 'Noto Sans KR', sans-serif;
+            margin-top: 20px;
+            line-height: 1.5;
+            font-size: 1.2rem;
+        }
+        .back-button {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #6d523c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-top: 30px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            font-size: 1.1rem;
+        }
+        .back-button:hover {
+            background-color: #4a3a2a;
+        }
+        .final-report-content {
+            font-family: 'Noto Sans KR', sans-serif;
+            text-align: left;
+            margin-top: 30px;
+            background-color: #fffaf0;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px dashed #d6a78f;
+        }
+        .stage-indicator {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-weight: 700;
+            color: #c2410c;
+            margin-bottom: 1rem;
+        }
+        .ox-quiz-container {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #fffaf0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .ox-quiz-question {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+        .ox-quiz-buttons button {
+            font-size: 1.5rem;
+            padding: 10px 30px;
+            margin: 0 10px;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+        }
+        .puzzle-container, .anagram-container {
+            margin: 20px auto;
+            padding: 10px;
+            background-color: #fffaf0;
+            border-radius: 10px;
+        }
+        .puzzle-board {
+            display: grid;
+            grid-template-columns: repeat(3, 80px);
+            gap: 2px;
+            margin: 0 auto;
+            width: 244px;  /* 80*3 + 2*2 */
+            height: 326px; /* 80*4 + 2*3 */
+            border: 2px solid #d6a78f;
+        }
+        .puzzle-piece, .puzzle-slot {
+            width: 80px;
+            height: 80px;
+            border: 1px dashed #d6a78f;
+            background-size: 240px 320px; /* 80*3, 80*4 */
+        }
+        .puzzle-pieces-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 10px;
+            min-height: 170px;
+        }
+        .puzzle-piece {
+            cursor: grab;
+        }
+        .anagram-slots, .anagram-letters {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .anagram-slot, .anagram-letter {
+            width: 50px;
+            height: 50px;
+            border: 2px dashed #d6a78f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background-color: #fff;
+        }
+        .anagram-letter {
+            background-color: #fce7cf;
+            cursor: grab;
+        }
+        .highlight {
+            font-weight: 700;
+            color: #c2410c;
+        }
+        .clue4-input {
+            width: 36px;
+            height: 36px;
+            text-align: center;
+            font-size: 1.2rem;
+            border: 2px solid #d6a78f;
+            border-radius: 5px;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="escape-room-container" id="escapeRoomApp">
+    </div>
+
+<script>
+    const escapeRoomApp = document.getElementById('escapeRoomApp');
+    const ENTRANCE_CODE = "1004"; // 현장 조사 후 입장 코드
+    
+    let missionProgress = JSON.parse(localStorage.getItem('missionProgress_session1')) || {
+        1: { stage: 1, keyword: "" },
+        2: { stage: 1, keyword: "" },
+        3: { stage: 1, quiz_step: 0, keyword: "" },
+        4: { stage: 1, keyword: "" },
+        5: { stage: 1, keyword: "" }
+    };
+
+    const missionDetails = [
+        {
+            id: 1,
+            type: 'direct_keyword',
+            title: "단서 1. 범인의 그림자",
+            clue: "도서관 벽에 있는 긴급 속보를 찾으세요. 이 범인의 가장 중요한 특징은 무엇인가요? (두 단어)",
+            answer: "보이지 않는",
+            hint_chosung: "힌트: ㅂㅇㅈ ㅇㄴ",
+            call_number: null
+        },
+        {
+            id: 2,
+            type: 'puzzle_then_keyword',
+            title: "단서 2. 범인의 은신처",
+            book_puzzle_image: "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791187743828.jpg",
+            book_clue: "아래 책 표지 퍼즐을 완성하세요.",
+            call_number: "516.3 김74ㅅ",
+        },
+        {
+            id: 3,
+            type: 'quiz_then_keyword',
+            title: "단서 3. 범인의 공격 방식",
+            ox_quizzes: [
+                { q: "감기에 걸리면 우리 몸의 체온은 올라간다. (O/X)", a: "O" },
+                { q: "재채기를 할 때 손으로 입을 가리는 것이 가장 좋은 방법이다. (O/X)", a: "X" },
+                { q: "우리 몸에 나쁜 세균이 들어오면 백혈구가 싸운다. (O/X)", a: "O" }
+            ],
+            call_number: "475 라76ㄱ",
+        },
+        {
+            id: 4,
+            type: 'clue_then_keyword',
+            title: "단서 4. 범인에게 빼앗긴 것",
+            book_clue: "범인은 우리에게서 아주 소중한 것을 빼앗아 갔어요. 도서관 벽에서 같은 표정의 얼굴을 찾고, 청구기호를 완성해 보세요.",
+            book_answer: ['8', '1', '3', '8', '9', '4', 'ㅇ'],
+            book_hint: "", // 힌트 없음
+            call_number: "813.8김94ㅇ", 
+        },
+        {
+            id: 5,
+            type: 'anagram_then_keyword',
+            title: "단서 5. 희망의 메시지",
+            book_clue: "아래 뒤섞인 글자 조각들을 올바른 순서로 배열하여 책 제목을 완성하세요.",
+            book_answer: "함께라면천하무적",
+            call_number: "110 샤77ㅎ",
+        }
+    ];
+
+    let draggedPiece = null;
+    let draggedPieceOrigin = null;
+
+    function saveProgress() {
+        localStorage.setItem('missionProgress_session1', JSON.stringify(missionProgress));
+    }
+    
+    function renderEscapeRoomPage(pageIndex) {
+        let html = '';
+
+        if (pageIndex === 0) { 
+            html = `
+                <h2 class="escape-room-header">건강 지킴이 탐정단 <br> 암호 해독 작전</h2>
+                <div class="escape-room-content">
+                    <div style="text-align: left; padding: 20px; border: 2px dashed #d6a78f; border-radius: 5px; background: #fffaf0; display: flex; flex-direction: column; min-height: 250px;">
+                        <p class="mb-4">건강 지킴이 탐정단에게,</p>
+                        <p style="flex-grow: 1;">
+                            최근 우리 학교에 웃음과 활기를 앗아가는 의문의 습격 사건이 연이어 발생하고 있다. 습격을 당한 학생들은 즐겁게 뛰어놀지 못하고 있다. 이 보이지 않는 범인의 정체를 밝혀내고, 모든 학생의 웃음을 되찾아주길 바란다. 이것은 탐정단에게 주어진 첫 번째 공식 미션이다.
+                        </p>
+                        <p style="text-align: right; margin-top: 20px;">-교장선생님-</p>
+                    </div>
+                </div>
+                <button class="mission-button" onclick="renderEscapeRoomPage(1)">미션 수락!</button>
+            `;
+        } else if (pageIndex === 1) { 
+             html = `
+                <h2 class="escape-room-header">탐정단 임명 및 규칙 안내</h2>
+                <div class="escape-room-content">
+                    <p class="mb-6">여러분은 이제부터 우리 학교의 건강과 웃음을 지키는 '건강 지킴이 탐정단'의 정식 요원입니다!</p>
+                    <div class="p-4 bg-amber-100 border-l-4 border-amber-500 text-amber-800">
+                        <p>본격적인 수사에 앞서, 탐정단으로서 지켜야 할 규칙에 대해 알아봅시다.</p>
+                        <p class="mt-2">선생님의 안내에 따라 탐정 수첩에 있는 탐정단 규칙을 확인해 봅시다.</p>
+                    </div>
+                </div>
+                <button class="mission-button" onclick="renderEscapeRoomPage(2)">준비되었습니다!</button>
+            `;
+        } else if (pageIndex === 2) { 
+            html = `
+                <h2 class="escape-room-header">첫 번째 임무: 현장 조사</h2>
+                <div class="escape-room-content">
+                    <p>탐정단의 첫 번째 임무는 사건 현장을 면밀히 조사하는 것입니다. 지금부터 여러분의 탐정 수첩에 도서관의 사건 현장을 관찰한 내용을 자세히 기록해주세요.</p>
+                    <p class="mt-4 p-4 bg-amber-100 border-l-4 border-amber-500 text-amber-800">
+                        모든 팀원이 관찰과 기록을 마쳤다면, 선생님께 입장 코드를 받아 아래에 입력하고 미션 보드로 이동하세요!
+                    </p>
+                    <div class="input-section">
+                        <input type="tel" inputmode="numeric" pattern="[0-9]*" id="entranceCode" placeholder="입장 코드를 입력하세요" onkeyup="if(event.keyCode===13){document.getElementById('enterBtn').click()}">
+                        <button id="enterBtn" onclick="checkEntranceCode()">입장</button>
+                    </div>
+                    <div id="resultMessage" class="result-message"></div>
+                </div>
+            `;
+        } else if (pageIndex === 3) { 
+            const allMissionsCompleted = Object.values(missionProgress).every(p => p.keyword !== "");
+            html = `
+                <h2 class="escape-room-header">단서 조각 미션 보드</h2>
+                <div class="escape-room-content">
+                    <p>탐정단원들! 5가지 단서 미션 중 원하는 것을 선택하여 사건의 실마리를 찾아보세요.</p>
+                     <p class="mt-4 p-4 bg-amber-100 border-l-4 border-amber-500 text-amber-800">
+                        모둠별로 힘을 합쳐 암호를 해독하고, 결과를 탐정 수첩에 꼼꼼히 기록하세요!
+                    </p>
+                </div>
+                <div class="mission-select-grid">
+                    ${missionDetails.map((mission, index) => `
+                        <button class="mission-button ${missionProgress[mission.id].keyword ? 'completed' : ''}" 
+                                onclick="renderEscapeRoomPage(${index + 4})">
+                            단서 ${mission.id}
+                            ${missionProgress[mission.id].keyword ? ' ✔' : ''}
+                        </button>
+                    `).join('')}
+                </div>
+                <button class="back-button" onclick="renderEscapeRoomPage(2)">현장 조사로 돌아가기</button>
+                ${allMissionsCompleted ? `<button class="mission-button" onclick="renderEscapeRoomPage(9)">최종 보고서 확인</button>` : ''}
+            `;
+        } else if (pageIndex >= 4 && pageIndex <= 8) { 
+            const mission = missionDetails[pageIndex - 4];
+            let stageHtml = '';
+
+            if (missionProgress[mission.id].keyword) { // Mission completed
+                 const infoWithoutBold = missionProgress[mission.id].keyword.replace(/<span class="highlight">/g, '<span style="color: #c2410c; font-weight: normal;">').replace(/<\/span>/g, '</span>');
+                stageHtml = `
+                    <div class="p-4 bg-green-100 border-l-4 border-green-500 text-green-800 text-lg">
+                        <p style="font-weight: normal;">미션 해결 완료!</p>
+                        <p class="mt-2" style="font-weight: normal;">획득한 정보: ${infoWithoutBold}</p>
+                    </div>
+                `;
+            } else { // Mission not completed
+                switch(mission.type) {
+                    case 'direct_keyword':
+                        stageHtml = `
+                            <p class="escape-room-content" style="text-align: left; background-color: #fffaf0; padding: 15px; border-radius: 5px;">
+                                <span class="highlight">[미션]</span> ${mission.clue}
+                            </p>
+                            <div class="input-section">
+                                <input type="text" id="answerInput" placeholder="찾은 단서를 입력하세요" onkeyup="if(event.keyCode===13){document.getElementById('checkBtn').click()}">
+                                <button id="checkBtn" onclick="checkAnswer(${mission.id})">확인</button>
+                            </div>
+                        `;
+                        break;
+                    case 'quiz_then_keyword':
+                        const quizStep = missionProgress[mission.id].quiz_step;
+                        stageHtml = `
+                            <p class="stage-indicator">[OX 퀴즈 (${quizStep + 1}/3)]</p>
+                            <div class="ox-quiz-container">
+                                <p class="ox-quiz-question">${mission.ox_quizzes[quizStep].q}</p>
+                                <div class="ox-quiz-buttons">
+                                    <button class="bg-blue-500 hover:bg-blue-700 text-white" onclick="checkOXAnswer(${mission.id}, 'O')">O</button>
+                                    <button class="bg-red-500 hover:bg-red-700 text-white" onclick="checkOXAnswer(${mission.id}, 'X')">X</button>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                    case 'puzzle_then_keyword':
+                       stageHtml = `
+                        <p class="escape-room-content" style="text-align: left; background-color: #fffaf0; padding: 15px; border-radius: 5px;">
+                            <span class="highlight">[미션]</span> ${mission.book_clue}
+                        </p>
+                        <div class="puzzle-container">
+                            <div id="puzzle-board" class="puzzle-board"></div>
+                            <div id="puzzle-pieces" class="puzzle-pieces-container"></div>
+                        </div>`;
+                        break;
+                    case 'anagram_then_keyword':
+                        stageHtml = `
+                        <p class="escape-room-content" style="text-align: left; background-color: #fffaf0; padding: 15px; border-radius: 5px;">
+                            <span class="highlight">[미션]</span> ${mission.book_clue}
+                        </p>
+                        <div class="anagram-container">
+                            <div id="anagram-slots" class="anagram-slots"></div>
+                            <div id="anagram-letters" class="anagram-letters"></div>
+                        </div>`;
+                        break;
+                    case 'clue_then_keyword':
+                         stageHtml = `
+                            <p class="escape-room-content" style="text-align: left; background-color: #fffaf0; padding: 15px; border-radius: 5px;">
+                                <span class="highlight">[미션]</span> ${mission.book_clue}
+                            </p>
+                            <div class="input-section flex items-center justify-center gap-1 flex-wrap" id="clue4-input-container">
+                                <!-- Inputs will be generated here by JS -->
+                            </div>
+                        `;
+                        break;
+                }
+            }
+
+            html = `
+                <h2 class="escape-room-header">${mission.title}</h2>
+                ${stageHtml}
+                <div id="resultMessage" class="result-message"></div>
+                <button class="back-button" onclick="renderEscapeRoomPage(3)">미션 보드로 돌아가기</button>
+            `;
+        } else if (pageIndex === 9) { 
+            html = `
+                <h2 class="escape-room-header">최종 수사 보고서</h2>
+                <div class="final-report-content">
+                    <p class="text-lg">모든 단서를 모은 탐정단 여러분, 수고 많았습니다!</p>
+                    <p class="mt-2">이제 탐정 수첩에 기록한 5가지 암호를 바탕으로 범인의 정체와 사건의 전말을 밝혀낼 시간입니다.</p>
+                    <h3 class="text-xl highlight mt-8 mb-4">암호 해독 작전</h3>
+                    <p>탐정 수첩에 있는 암호 해독 작전 페이지를 펴고, 모둠원과 함께 숨겨진 메시지를 찾아봅시다.</p>
+                </div>
+                <button class="back-button" onclick="renderEscapeRoomPage(3)">미션 보드로 돌아가기</button>
+            `;
+        }
+        escapeRoomApp.innerHTML = html;
+
+        if ((pageIndex >= 4 && pageIndex <= 8)) {
+            const mission = missionDetails[pageIndex - 4];
+             if(!missionProgress[mission.id].keyword) {
+                const input = document.getElementById('answerInput');
+                if (input) input.focus();
+
+                if (mission.type === 'puzzle_then_keyword') {
+                    initJigsawPuzzle(mission);
+                }
+                if (mission.type === 'anagram_then_keyword') {
+                    initAnagramPuzzle(mission);
+                }
+                if (mission.type === 'clue_then_keyword' && mission.id === 4) {
+                    initClue4Inputs();
+                }
+             }
+        }
+    }
+
+    function checkEntranceCode() {
+        const code = document.getElementById('entranceCode').value;
+        const resultMessageElement = document.getElementById('resultMessage');
+        if (code === ENTRANCE_CODE) {
+            resultMessageElement.className = "result-message text-green-700";
+            resultMessageElement.innerText = "인증 성공! 미션 보드로 이동합니다.";
+            setTimeout(() => renderEscapeRoomPage(3), 1000);
+        } else {
+            resultMessageElement.className = "result-message text-red-700";
+            resultMessageElement.innerText = "코드가 일치하지 않습니다. 다시 확인해주세요.";
+        }
+    }
+
+    function missionSuccess(missionId, successMessage) {
+        const resultMessageElement = document.getElementById('resultMessage');
+        resultMessageElement.className = "result-message text-green-700";
+        resultMessageElement.innerHTML = `
+            <div class="p-4 bg-green-100 border-l-4 border-green-500 text-green-800">
+                <p class="text-lg" style="font-weight: normal;">성공!</p>
+                <p class="mt-2" style="font-weight: normal;">${successMessage}</p>
+            </div>`;
+
+        missionProgress[missionId].keyword = successMessage;
+        saveProgress();
+    }
+
+    function checkAnswer(missionId) {
+        const mission = missionDetails.find(m => m.id === missionId);
+        const resultMessageElement = document.getElementById('resultMessage');
+        
+        let isCorrect = false;
+        let correctAnswerForSuccessMessage = '';
+
+        if (mission.id === 4) {
+            const inputs = document.querySelectorAll('#clue4-input-container .clue4-input');
+            const enteredValues = [...inputs].map(input => input.value);
+            isCorrect = JSON.stringify(enteredValues) === JSON.stringify(mission.book_answer);
+            correctAnswerForSuccessMessage = mission.call_number;
+        } else { // Handles mission 1
+            const inputElement = document.getElementById('answerInput');
+            const userAnswerRaw = inputElement.value.trim();
+            const correctAnswer = mission.answer;
+            isCorrect = userAnswerRaw === correctAnswer;
+            correctAnswerForSuccessMessage = correctAnswer;
+        }
+
+        if (isCorrect) {
+            let successMessage;
+            if (mission.call_number) {
+                 successMessage = `도서관에 있는 책을 찾으세요!<br><span class="highlight">청구기호: ${mission.call_number}</span>`;
+            } else {
+                 successMessage = `'${correctAnswerForSuccessMessage}' 단서를 획득했습니다!`;
+            }
+            missionSuccess(missionId, successMessage);
+        } else {
+            resultMessageElement.className = "result-message text-red-700";
+            let hint = mission.hint_chosung || mission.book_hint;
+            resultMessageElement.innerHTML = `정답이 아닙니다. 다시 시도해보세요!${hint ? `<br><span class="text-amber-600">${hint}</span>` : ''}`;
+            
+            if (mission.id === 4) {
+                 const inputs = document.querySelectorAll('#clue4-input-container .clue4-input');
+                 if (inputs.length > 0) {
+                     inputs.forEach(inp => inp.value = '');
+                     inputs[0].focus();
+                 }
+            } else {
+                const inputElement = document.getElementById('answerInput');
+                if (inputElement) {
+                    inputElement.focus();
+                    inputElement.select();
+                }
+            }
+        }
+    }
+
+    function initClue4Inputs() {
+        const container = document.getElementById('clue4-input-container');
+        if (!container) return;
+
+        container.innerHTML = '';
+        const answerLength = 7;
+        let isComposing = false;
+
+        for (let i = 0; i < answerLength; i++) {
+             if (i === 3) {
+                const dot = document.createElement('span');
+                dot.textContent = '.';
+                dot.classList.add('text-2xl', 'font-bold', 'mx-1', 'self-center');
+                container.appendChild(dot);
+            }
+            if (i === 4) {
+                const kim = document.createElement('span');
+                kim.textContent = '김';
+                kim.classList.add('text-2xl', 'font-bold', 'mx-1', 'self-center');
+                container.appendChild(kim);
+            }
+            const input = document.createElement('input');
+            
+            if (i < 6) { // Inputs for numbers
+                input.type = 'tel';
+                input.inputMode = 'numeric';
+            } else { // Last input for Korean character
+                input.type = 'text';
+            }
+            
+            input.maxLength = 1;
+            input.dataset.index = i;
+            input.classList.add('clue4-input');
+            container.appendChild(input);
+        }
+
+        const inputs = Array.from(container.querySelectorAll('.clue4-input'));
+        
+        const handleInput = (target, index) => {
+            if (target.value.length === 1 && index < inputs.length - 1) {
+                inputs[index + 1].focus();
+            }
+            const allFilled = inputs.every(inp => inp.value.length === 1);
+            if (allFilled) {
+                checkAnswer(4);
+            }
+        };
+
+        inputs.forEach((input, index) => {
+            input.addEventListener('compositionstart', () => {
+                isComposing = true;
+            });
+            input.addEventListener('compositionend', (event) => {
+                isComposing = false;
+            });
+            input.addEventListener('input', (event) => {
+                if (isComposing) return;
+                handleInput(event.target, index);
+            });
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && input.value.length === 0 && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+
+        if (inputs.length > 0) inputs[0].focus();
+    }
+
+
+    function checkOXAnswer(missionId, answer) {
+        const mission = missionDetails.find(m => m.id === missionId);
+        const currentProgress = missionProgress[missionId];
+        const quiz = mission.ox_quizzes[currentProgress.quiz_step];
+
+        if (answer === quiz.a) {
+            currentProgress.quiz_step++;
+            saveProgress();
+            if (currentProgress.quiz_step >= mission.ox_quizzes.length) {
+                const successMessage = `도서관에 있는 책을 찾으세요!<br><span class="highlight">청구기호: ${mission.call_number}</span>`;
+                missionSuccess(missionId, successMessage);
+            } else {
+                renderEscapeRoomPage(missionId + 3);
+            }
+        } else {
+            alert('틀렸습니다! 다시 생각해보세요.');
+        }
+    }
+
+    function addDragDropListeners(mission, checkCompletionCallback) {
+        const draggableSelector = mission.type === 'puzzle_then_keyword' ? '.puzzle-piece' : '.anagram-letter';
+        
+        const containerSelector = mission.type === 'puzzle_then_keyword' 
+            ? '.puzzle-piece, .puzzle-slot, .puzzle-pieces-container' 
+            : '.anagram-letter, .anagram-slot, .anagram-letters';
+
+        document.querySelectorAll(containerSelector).forEach(item => {
+            item.addEventListener('dragstart', (e) => {
+                if(e.target.matches(draggableSelector)){
+                    draggedPiece = e.target;
+                    draggedPieceOrigin = e.target.parentElement;
+                }
+            });
+             item.addEventListener('dragover', (e) => e.preventDefault());
+             item.addEventListener('drop', (e) => handleDrop(e, checkCompletionCallback));
+        });
+        
+        let ghostElement = null;
+        let offsetX = 0, offsetY = 0;
+
+        document.querySelectorAll(draggableSelector).forEach(piece => {
+            piece.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                draggedPiece = e.currentTarget;
+                draggedPieceOrigin = draggedPiece.parentElement;
+
+                const rect = draggedPiece.getBoundingClientRect();
+                const touch = e.touches[0];
+                offsetX = touch.clientX - rect.left;
+                offsetY = touch.clientY - rect.top;
+
+                ghostElement = draggedPiece.cloneNode(true);
+                ghostElement.style.width = `${rect.width}px`;
+                ghostElement.style.height = `${rect.height}px`;
+                ghostElement.style.position = 'fixed'; // Use fixed positioning
+                ghostElement.style.pointerEvents = 'none';
+                ghostElement.style.zIndex = '1000';
+                ghostElement.style.opacity = '0.8';
+                
+                ghostElement.style.left = `${touch.clientX - offsetX}px`;
+                ghostElement.style.top = `${touch.clientY - offsetY}px`;
+                
+                document.body.appendChild(ghostElement);
+
+                draggedPiece.style.opacity = '0.4';
+            }, { passive: false });
+
+            piece.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (!ghostElement) return;
+                const touch = e.touches[0];
+                ghostElement.style.left = `${touch.clientX - offsetX}px`;
+                ghostElement.style.top = `${touch.clientY - offsetY}px`;
+            }, { passive: false });
+
+            piece.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                if (!draggedPiece || !ghostElement) return;
+                
+                ghostElement.style.display = 'none'; 
+                const touch = e.changedTouches[0];
+                const dropTargetElement = document.elementFromPoint(touch.clientX, touch.clientY);
+                
+                ghostElement.remove();
+                ghostElement = null;
+
+                handleDropLogic(dropTargetElement);
+                
+                draggedPiece.style.opacity = '1';
+                draggedPiece = null;
+                draggedPieceOrigin = null;
+
+                checkCompletionCallback();
+            });
+        });
+    }
+
+    function handleDropLogic(dropTarget) {
+        if (!draggedPiece) return;
+        
+        const slotSelector = draggedPiece.classList.contains('puzzle-piece') ? '.puzzle-slot' : '.anagram-slot';
+        const containerSelector = draggedPiece.classList.contains('puzzle-piece') ? '.puzzle-pieces-container' : '.anagram-letters';
+        const itemSelector = draggedPiece.classList.contains('puzzle-piece') ? '.puzzle-piece' : '.anagram-letter';
+
+        const target = dropTarget ? dropTarget.closest(`${slotSelector}, ${containerSelector}`) : null;
+
+        if (!target) {
+            if (draggedPieceOrigin) draggedPieceOrigin.appendChild(draggedPiece);
+            return;
+        }
+
+        const existingPiece = target.querySelector(itemSelector);
+
+        if (target.matches(slotSelector)) {
+            if (existingPiece) {
+                draggedPieceOrigin.appendChild(existingPiece);
+            }
+            target.appendChild(draggedPiece);
+        } else if (target.matches(containerSelector)) {
+            target.appendChild(draggedPiece);
+        } else {
+            if (draggedPieceOrigin) draggedPieceOrigin.appendChild(draggedPiece);
+        }
+    }
+    
+    function handleDrop(e, checkCompletionCallback) {
+        e.preventDefault();
+        handleDropLogic(e.target);
+        draggedPiece = null;
+        draggedPieceOrigin = null;
+        checkCompletionCallback();
+    }
+
+    function initJigsawPuzzle(mission) {
+        const board = document.getElementById('puzzle-board');
+        const piecesContainer = document.getElementById('puzzle-pieces');
+        board.innerHTML = '';
+        piecesContainer.innerHTML = '';
+
+        const pieces = [];
+        const pieceWidth = 80;
+        const pieceHeight = 80;
+        const rows = 4;
+        const cols = 3;
+        const pieceCount = rows * cols;
+
+        board.style.gridTemplateColumns = `repeat(${cols}, ${pieceWidth}px)`;
+        board.style.width = `${pieceWidth * cols + 2 * (cols - 1)}px`;
+        board.style.height = `${pieceHeight * rows + 2 * (rows - 1)}px`;
+
+        for (let i = 0; i < pieceCount; i++) {
+            const slot = document.createElement('div');
+            slot.classList.add('puzzle-slot');
+            slot.dataset.index = i;
+            board.appendChild(slot);
+
+            const piece = document.createElement('div');
+            piece.classList.add('puzzle-piece');
+            piece.style.backgroundImage = `url(${mission.book_puzzle_image})`;
+            piece.style.width = `${pieceWidth}px`;
+            piece.style.height = `${pieceHeight}px`;
+            piece.style.backgroundSize = `${pieceWidth * cols}px ${pieceHeight * rows}px`;
+            const row = Math.floor(i / cols);
+            const col = i % cols;
+            piece.style.backgroundPosition = `-${col * pieceWidth}px -${row * pieceHeight}px`;
+            piece.dataset.index = i;
+            piece.draggable = true;
+            pieces.push(piece);
+        }
+        
+        pieces.sort(() => Math.random() - 0.5).forEach(p => piecesContainer.appendChild(p));
+        
+        addDragDropListeners(mission, () => checkPuzzleCompletion(mission));
+    }
+
+    function checkPuzzleCompletion(mission) {
+        if (document.querySelectorAll('#puzzle-pieces .puzzle-piece').length > 0) return;
+
+        const slots = document.querySelectorAll('#puzzle-board .puzzle-slot');
+        let completed = true;
+        slots.forEach((slot, index) => {
+            const piece = slot.firstChild;
+            if (!piece || parseInt(piece.dataset.index) !== index) {
+                completed = false;
+            }
+        });
+
+        if (completed) {
+             const successMessage = `도서관에 있는 책을 찾으세요!<br><span class="highlight">청구기호: ${mission.call_number}</span>`;
+             missionSuccess(mission.id, successMessage);
+        }
+    }
+    
+    function initAnagramPuzzle(mission) {
+        const slotsContainer = document.getElementById('anagram-slots');
+        const lettersContainer = document.getElementById('anagram-letters');
+        slotsContainer.innerHTML = '';
+        lettersContainer.innerHTML = '';
+        
+        const answerNoSpace = mission.book_answer;
+        const letters = answerNoSpace.split('');
+
+        for (let i = 0; i < answerNoSpace.length; i++) {
+            const slot = document.createElement('div');
+            slot.classList.add('anagram-slot');
+            slot.dataset.index = i;
+            slotsContainer.appendChild(slot);
+        }
+        
+        letters.sort(() => Math.random() - 0.5).forEach((letter, i) => {
+            const letterEl = document.createElement('div');
+            letterEl.classList.add('anagram-letter');
+            letterEl.innerText = letter;
+            letterEl.dataset.id = `letter-${i}`;
+            letterEl.draggable = true;
+            lettersContainer.appendChild(letterEl);
+        });
+
+        addDragDropListeners(mission, () => checkAnagramCompletion(mission));
+    }
+
+    function checkAnagramCompletion(mission) {
+        const slots = document.querySelectorAll('#anagram-slots .anagram-slot');
+        if (document.querySelectorAll('#anagram-letters .anagram-letter').length > 0) return;
+
+        let currentGuess = '';
+        slots.forEach(s => {
+            if (s.firstChild) {
+                currentGuess += s.firstChild.innerText;
+            }
+        });
+        
+        if (currentGuess === mission.book_answer) {
+            const successMessage = `도서관에 있는 책을 찾으세요!<br><span class="highlight">청구기호: ${mission.call_number}</span>`;
+            missionSuccess(mission.id, successMessage);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        renderEscapeRoomPage(0);
+    });
+</script>
+</body>
+</html>
+
