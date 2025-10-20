@@ -263,7 +263,9 @@
             type: 'clue_then_keyword',
             title: "단서 4. 범인에게 빼앗긴 것",
             book_clue: "범인은 우리에게서 아주 소중한 것을 빼앗아 갔어요. 도서관 벽에서 같은 표정의 얼굴을 찾고, 청구기호를 완성해 보세요.",
-            book_answer: ['8', '1', '3', '8', '9', '4', 'ㅇ'],
+            // --- ⬇️ 수정된 부분 1: 정답 배열 변경 ⬇️ ---
+            book_answer: ['8', '1', '3', '8', '9', '4'],
+            // --- ⬆️ 수정된 부분 1: 정답 배열 변경 ⬆️ ---
             book_hint: "", // 힌트 없음
             call_number: "813.8김94ㅇ", 
         },
@@ -414,8 +416,7 @@
                                 <span class="highlight">[미션]</span> ${mission.book_clue}
                             </p>
                             <div class="input-section flex items-center justify-center gap-1 flex-wrap" id="clue4-input-container">
-                                <!-- Inputs will be generated here by JS -->
-                            </div>
+                                </div>
                         `;
                         break;
                 }
@@ -496,6 +497,7 @@
         if (mission.id === 4) {
             const inputs = document.querySelectorAll('#clue4-input-container .clue4-input');
             const enteredValues = [...inputs].map(input => input.value);
+            // checkAnswer 로직은 book_answer 배열이 수정되었기 때문에 자동으로 6개만 비교합니다.
             isCorrect = JSON.stringify(enteredValues) === JSON.stringify(mission.book_answer);
             correctAnswerForSuccessMessage = mission.call_number;
         } else { // Handles mission 1
@@ -535,35 +537,34 @@
         }
     }
 
+    // --- ⬇️ 수정된 부분 2: initClue4Inputs 함수 변경 ⬇️ ---
     function initClue4Inputs() {
         const container = document.getElementById('clue4-input-container');
         if (!container) return;
 
         container.innerHTML = '';
-        const answerLength = 7;
+        const answerLength = 6; // 7에서 6으로 변경 (입력칸 6개)
         let isComposing = false;
 
-        for (let i = 0; i < answerLength; i++) {
-             if (i === 3) {
+        for (let i = 0; i < answerLength; i++) { // 0부터 5까지 (총 6번) 루프
+             if (i === 3) { // 3번째 입력칸 뒤에 '.'
                 const dot = document.createElement('span');
                 dot.textContent = '.';
                 dot.classList.add('text-2xl', 'font-bold', 'mx-1', 'self-center');
                 container.appendChild(dot);
             }
-            if (i === 4) {
+            if (i === 4) { // 4번째 입력칸 뒤에 '김'
                 const kim = document.createElement('span');
                 kim.textContent = '김';
                 kim.classList.add('text-2xl', 'font-bold', 'mx-1', 'self-center');
                 container.appendChild(kim);
             }
+            
             const input = document.createElement('input');
             
-            if (i < 6) { // Inputs for numbers
-                input.type = 'tel';
-                input.inputMode = 'numeric';
-            } else { // Last input for Korean character
-                input.type = 'text';
-            }
+            // 모든 입력칸을 숫자로 설정
+            input.type = 'tel';
+            input.inputMode = 'numeric';
             
             input.maxLength = 1;
             input.dataset.index = i;
@@ -571,19 +572,28 @@
             container.appendChild(input);
         }
 
+        // 루프가 끝난 후(마지막 6번째 입력칸 뒤에) 'ㅇ' 텍스트 추가
+        const oh = document.createElement('span');
+        oh.textContent = 'ㅇ';
+        oh.classList.add('text-2xl', 'font-bold', 'mx-1', 'self-center');
+        container.appendChild(oh);
+
         const inputs = Array.from(container.querySelectorAll('.clue4-input'));
         
         const handleInput = (target, index) => {
             if (target.value.length === 1 && index < inputs.length - 1) {
                 inputs[index + 1].focus();
             }
+            // 모든 6개 칸이 채워졌는지 확인
             const allFilled = inputs.every(inp => inp.value.length === 1);
             if (allFilled) {
-                checkAnswer(4);
+                checkAnswer(4); // 정답 확인
             }
         };
 
         inputs.forEach((input, index) => {
+            // 'composition' 이벤트는 한글 입력을 위해 필요했으나, 
+            // 이제 숫자만 입력받으므로 제거해도 되지만, 만약을 위해 남겨둡니다.
             input.addEventListener('compositionstart', () => {
                 isComposing = true;
             });
@@ -603,6 +613,7 @@
 
         if (inputs.length > 0) inputs[0].focus();
     }
+    // --- ⬆️ 수정된 부분 2: initClue4Inputs 함수 변경 ⬆️ ---
 
 
     function checkOXAnswer(missionId, answer) {
@@ -849,4 +860,3 @@
 </script>
 </body>
 </html>
-
